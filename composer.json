@@ -1,0 +1,26 @@
+{
+    "name": "paynl/omnipay-paynl-v3",
+    "description": "Pay.nl driver for the Omnipay PHP payment processing library based on the V3 PayNL orders API",
+    "type": "library",
+    "require": {
+        "omnipay/common": "^3.3",
+        "ext-json": "*"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Omnipay\\PaynlV3\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bas van der Ven",
+            "email": "bas.vanderven@scenius.nl"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
+    }
+}
