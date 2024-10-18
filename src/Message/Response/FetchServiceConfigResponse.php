@@ -7,7 +7,10 @@ use Omnipay\Common\Message\RequestInterface;
 class FetchServiceConfigResponse {
 
     protected RequestInterface $request;
-    protected mixed $data;
+    /**
+     * @var array|null
+     */
+    protected $data;
 
     public function __construct(RequestInterface $request, $data)
     {

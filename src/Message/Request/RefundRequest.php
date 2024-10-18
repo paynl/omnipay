@@ -27,7 +27,7 @@ class RefundRequest extends AbstractPaynlRequest
      */
     public function sendData($data)
     {
-        $responseData = $this->sendRequestRestApi('transactions/' . $data['id'] . '/refund', method: 'PATCH');
+        $responseData = $this->sendRequestRestApi('transactions/' . $data['id'] . '/refund', null, 'PATCH');
         return $this->response = new RefundResponse($this, $responseData);
     }
 }
