@@ -3,6 +3,7 @@
     "description": "Pay.nl driver for the Omnipay PHP payment processing library based on the V3 PayNL orders API",
     "type": "library",
     "require": {
+        "php": ">=7.4",
         "omnipay/common": "^3.3",
         "ext-json": "*"
     },

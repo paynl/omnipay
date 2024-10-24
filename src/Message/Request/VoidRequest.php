@@ -34,7 +34,7 @@ class VoidRequest extends AbstractPaynlRequest
     {
         $voidUrl = '/' . $data['id'] . '/void';
 
-        $responseData = $this->sendRequestMultiCore($voidUrl, method: 'PATCH');
+        $responseData = $this->sendRequestMultiCore($voidUrl, null, 'PATCH');
         return $this->response = new VoidResponse($this, $responseData);
     }
 }

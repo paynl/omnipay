@@ -34,7 +34,7 @@ Bank Transfer | Cartasi | GivaCard | SprayPay | Przelewy24 |
 
 # Requirements
 
-    PHP 5.6 or higher
+    PHP 7.4 or higher
 
 
 # Installation
