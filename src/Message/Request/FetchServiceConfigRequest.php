@@ -19,21 +19,4 @@ class FetchServiceConfigRequest extends AbstractPaynlRequest
         $responseData = $this->sendRequestRestApi('services/config');
         return $this->response = new FetchServiceConfigResponse($this, $responseData);
     }
-
-    /**
-     * @return string
-     */
-    public function getStatusUrl()
-    {
-        return $this->getParameter('statusUrl');
-    }
-
-    /**
-     * @param $value string
-     * @return $this
-     */
-    public function setStatusUrl($value)
-    {
-        return $this->setParameter('statusUrl', $value);
-    }
 }

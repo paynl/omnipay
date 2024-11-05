@@ -1,0 +1,11 @@
+<phpunit colors="true" bootstrap="vendor/autoload.php">
+    <php>
+        <env name="PAYNL_SERVICE_CODE" value="" force="true"/>
+        <env name="PAYNL_API_SECRET" value="" force="true"/>
+    </php>
+    <testsuites>
+        <testsuite name="Omni pay v3 tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

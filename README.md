@@ -13,6 +13,7 @@ Pay. driver for the Omnipay payment processing library
 - [Installation](#installation)
 - [Update instructions](#update-instructions)
 - [Usage](#usage)
+- [Tests](#test)
 - [Support](#support)
 
 
@@ -34,7 +35,10 @@ Bank Transfer | Cartasi | GivaCard | SprayPay | Przelewy24 |
 
 # Requirements
 
-    PHP 5.6 or higher
+Before running the tests, make sure you have:
+- PHP installed (7.4 or higher recommended)
+- Composer installed
+- A Pay.nl account with API credentials
 
 
 # Installation
@@ -66,10 +70,11 @@ use Omnipay\Omnipay;
 $gateway = Omnipay::create('PaynlV3');
  
 $gateway->setApiSecret('****************************************');
-$gateway->setTokenCode('SL-####-####');
+$gateway->setTokenCode('AT-####-####');
+$gateway->setServiceId('SL-####-####');
 ```
 
-3. Enter the TokenCode, API token (these can be found in the Pay. My Pay Panel --> https://my.pay.nl/
+3. Enter the TokenCode, API token, ServiceId (these can be found in the Pay. My Pay Panel --> https://my.pay.nl/
 
 Go to the *Settings* / *Sales locations* tab in the Pay. Scroll down to the sales location and there copy the SL code and the secret.
 
@@ -90,9 +95,7 @@ The plugin has now been updated
 # Usage
 ### Get payment methods
 ```php
-$response = $gateway->fetchPaymentMethods([
-    'serviceId' => "SL-####-####",
-])->send();
+$response = $gateway->fetchPaymentMethods()->send();
 
 $response->getPaymentMethods();
 
@@ -107,9 +110,7 @@ foreach ($response->getPaymentMethods() as $paymentMethod) {
 
 ### Get Issuers (Ideal)
 ```php
-$response = $gateway->fetchIssuers([
-    'serviceId' => "SL-####-####",
-])->send();
+$response = $gateway->fetchIssuers()->send();
 
 $response->getIssuers();
 
@@ -205,16 +206,23 @@ if ($response->isSuccessful()) {
     $statusUrl = $response->getStatusUrl();
     $voidUrl = $response->getVoidUrl();
     $redirectUrl = $response->getRedirectUrl();
+    $givenCaptureUrl = $response->getCaptureUrl();
+    $givenCaptureAmountUrl = $response->getCaptureAmountUrl();
+    $givenCaptureProductsUrl = $response->getCaptureProductsUrl();
+    $abortUrl = $response->getAbortUrl();
+    $approveUrl = $response->getApproveUrl();
+    $declineUrl = $response->getDeclineUrl();
+    $debugUrl = $response->getDebugUrl();
+    $checkoutUrl = $response->getCheckoutUrl();
+}
 
     # Payment was successful
     var_dump($response);
  
 } elseif ($response->isRedirect()) {
     # Get the url for fetching the Transaction
-get
-     
+    $redirectUrl = $response->getRedirectUrl();     
 } else {
- 
     # Payment failed
     echo $response->getMessage();
 }
@@ -222,8 +230,69 @@ get
 ### Get a transaction (Order:status)
 
 ```php
-$response = $gateway->fetchTransaction([
-    'transactionReference' => "##########",
+$response = $gateway->fetchTransaction(['stateUrl' => $statusUrl])->send();
+
+if ($response->isSuccessful()) {
+    # Get was successful
+    print_r($response);
+
+} else {
+    # Get failed
+    echo $response->getMessage();
+}
+```
+
+### Approve order (Order:approve)
+
+```php
+$response = $gateway->approve(['approveUrl' => $approveUrl])->send();
+
+if ($response->isSuccessful()) {
+    # Get was successful
+    print_r($response);
+
+} else {
+    # Get failed
+    echo $response->getMessage();
+}
+```
+
+### Approve order (Order:Decline)
+
+```php
+$response = $gateway->decline(['declineUrl' => $declineUrl])->send();
+
+if ($response->isSuccessful()) {
+    # Get was successful
+    print_r($response);
+
+} else {
+    # Get failed
+    echo $response->getMessage();
+}
+```
+
+### Capture order (Order:Capture)
+
+```php
+$response = $gateway->capture(['captureUrl' => $captureUrl])->send();
+
+if ($response->isSuccessful()) {
+    # Get was successful
+    print_r($response);
+
+} else {
+    # Get failed
+    echo $response->getMessage();
+}
+```
+
+### Capture amount order (Order:CaptureAmount)
+
+```php
+$response = $gateway->captureAmount([
+    'captureAmountUrl' => $captureAmountUrl, 
+    'amount' => '14.00'
 ])->send();
 
 if ($response->isSuccessful()) {
@@ -236,19 +305,23 @@ if ($response->isSuccessful()) {
 }
 ```
 
-### Refund a transaction
-```php
-$response = $gateway->refund([
-    'transactionReference' => '##########'
-])->send();```
+### Capture products order (Order:CaptureProducts)
 
-### Capture a transaction
 ```php
+$arrItems = array();
+$item = new Item();
+$item->setProductId('SKU01')
+        ->setProductType('ARTICLE')
+        ->setVatPercentage(21)
+        ->setDescription('Description')
+        ->setPrice('10')
+        ->setQuantity(4);
 
-$response = $gateway->capture([
-    'transactionReference' => '##########',
-    'amount' => '23.32',
-    'items' => array(),
+$arrItems[] = $item;
+
+$response = $gateway->captureProducts([
+    'captureAmountUrl' => $captureProductsUrl, 
+    'items' => $arrItems
 ])->send();
 
 if ($response->isSuccessful()) {
@@ -259,15 +332,29 @@ if ($response->isSuccessful()) {
     # Get failed
     echo $response->getMessage();
 }
+```
 
+### Capture products order (Order:Abort)
+
+```php
+$response = $gateway->abort([
+    'abortUrl' => $abortUrl
+])->send();
+
+if ($response->isSuccessful()) {
+    # Get was successful
+    print_r($response);
+
+} else {
+    # Get failed
+    echo $response->getMessage();
+}
 ```
 
 ### Void a transaction
 
 ```php
-$response = $gateway->void([
-    'transactionReference' => "##########",
-])->send();
+$response = $gateway->void(['voidUrl' => $voidUrl])->send();
 
 if ($response->isSuccessful()) {
     # Get was successful
@@ -278,6 +365,45 @@ if ($response->isSuccessful()) {
     echo $response->getMessage();
 }
 ```
+
+# Test
+
+Before running the tests, make sure you have:
+- PHP installed (7.4 or higher recommended)
+- Composer installed
+- A Pay.nl account with API credentials
+
+## Setup
+
+1. Install dependencies:
+```bash
+composer install
+```
+
+2. Create a copy of the phpunit configuration file:
+```bash
+cp phpunit.xml.dist phpunit.xml
+```
+
+3. Configure environment variables in your `phpunit.xml`:
+
+Replace the empty values with your Pay.nl credentials:
+
+> **Note**: Never commit your actual API credentials to version control. The `phpunit.xml` file should be in your `.gitignore`.
+
+## Running Tests
+
+To run all tests:
+```bash
+./vendor/bin/phpunit --testsuite "Omni pay v3 tests"
+```
+
+## Environment Variables
+
+| Variable | Description                                      |
+|----------|--------------------------------------------------|
+| `PAYNL_SERVICE_CODE` | Your Pay.nl service location code (SL-xxxx-xxxx) |
+| `PAYNL_API_SECRET` | Your Pay.nl API token                            |
 
 # Support
 https://www.pay.nl
