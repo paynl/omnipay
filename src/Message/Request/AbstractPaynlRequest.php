@@ -14,9 +14,9 @@ abstract class AbstractPaynlRequest extends AbstractRequest
     /**
      * @var string
      */
-    private $restUri = 'https://rest.pay.nl/v2/';
-    private $baseUrlPrefix = 'https://connect.';
-    private $ordersEdnpoint = 'v1/orders';
+    private string $restUri = 'https://rest.pay.nl/v2/';
+    private string $baseUrlPrefix = 'https://connect.';
+    private string $ordersEndpoint = 'v1/orders';
 
 
     /**
@@ -30,7 +30,7 @@ abstract class AbstractPaynlRequest extends AbstractRequest
 
         foreach ($coreDomains as $coreDomain) {
             try {
-                $url = $this->baseUrlPrefix . $coreDomain . '/' . $this->ordersEdnpoint;
+                $url = $this->baseUrlPrefix . $coreDomain . '/' . $this->ordersEndpoint;
                 $response = $this->sendRequest($url, $data, 'POST', false);
 
                 if ($response->getStatusCode() === 500 || $response->getStatusCode() === 503 || $response->getStatusCode() == null) {
@@ -74,10 +74,8 @@ abstract class AbstractPaynlRequest extends AbstractRequest
         {
             return json_decode($response->getBody(), true);
         }
-        else
-        {
-            return $response;
-        }
+
+        return $response;
     }
 
     /**
@@ -153,7 +151,7 @@ abstract class AbstractPaynlRequest extends AbstractRequest
     {
         $coreDomains = $this->getParameter('coreDomains');
         if (!isset($coreDomains) || count($coreDomains) == 0) {
-            return array('pay.nl');
+            return ['pay.nl'];
         }
 
         return $coreDomains;

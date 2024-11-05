@@ -17,7 +17,7 @@ class AbortFlowTest extends TestBaseOmniPay
         $stateResponse = $gateway->abort(['abortUrl' => $abortUrl])->send();
 
         $this->assertTrue($stateResponse->isSuccessful());
-        $this->assertEquals($stateResponse->getOrderStateCode(), -90);
-        $this->assertEquals($stateResponse->getOrderState(), 'CANCEL');
+        $this->assertEquals(-90, $stateResponse->getOrderStateCode());
+        $this->assertEquals('CANCEL', $stateResponse->getOrderState());
     }
 }

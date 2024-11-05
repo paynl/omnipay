@@ -5,7 +5,7 @@ namespace Omnipay\PaynlV3\Internal;
 class PayOrderNotFoundResponse {
 
     protected $data;
-    private $orderNotFoundStatusCode = 'PAY-2001';
+    private string $orderNotFoundStatusCode = 'PAY-2001';
 
     public function __construct($data)
     {

@@ -18,7 +18,7 @@ class PurchaseFlowTest extends TestBaseOmniPay
                 'transactionReference' => 'referenceID1',
                 'clientIp' => '192.168.192.12',
                 'serviceId' => $this->getServiceCode(),
-                'returnUrl' => 'http://www.yourdomain.com/return_from_pay',
+                'returnUrl' => 'https://www.yourdomain.com/return_from_pay',
                 'card' => array(
                     'firstName' => 'Example',
                     'lastName' => 'User',

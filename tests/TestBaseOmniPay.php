@@ -2,7 +2,6 @@
 
 namespace tests;
 
-use Dotenv\Dotenv;
 use Omnipay\Omnipay;
 use PHPUnit\Framework\TestCase;
 

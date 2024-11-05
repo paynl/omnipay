@@ -16,6 +16,6 @@ class ApproveFlowTest extends TestBaseOmniPay
         $approveResponse = $gateway->approve(['approveUrl' => $approveUrl])->send();
 
         $this->assertFalse($approveResponse->isSuccessful());
-        $this->assertEquals($approveResponse->getMessage(), 'PAY-2004');
+        $this->assertEquals('PAY-2004', $approveResponse->getMessage());
     }
 }

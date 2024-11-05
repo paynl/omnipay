@@ -18,7 +18,7 @@ class CaptureFlowTest extends TestBaseOmniPay
         $captureResponse = $gateway->capture(['captureUrl' => $captureUrl])->send();
 
         $this->assertFalse($captureResponse->isSuccessful());
-        $this->assertEquals($captureResponse->getMessage(), 'PAY-2008');
+        $this->assertEquals('PAY-2008', $captureResponse->getMessage());
     }
 
     public function testCaptureAmountRegularBadFlow()
@@ -31,7 +31,7 @@ class CaptureFlowTest extends TestBaseOmniPay
         $captureResponse = $gateway->captureAmount(['captureAmountUrl' => $captureAmountUrl, 'amount' => '5.00'])->send();
 
         $this->assertFalse($captureResponse->isSuccessful());
-        $this->assertEquals($captureResponse->getMessage(), 'PAY-2008');
+        $this->assertEquals('PAY-2008', $captureResponse->getMessage());
     }
 
     public function testCaptureProductRegularBadFlow()
@@ -54,7 +54,7 @@ class CaptureFlowTest extends TestBaseOmniPay
         $captureResponse = $gateway->captureProducts(['captureProductsUrl' => $captureProductsUrl, 'items' => $arrItems])->send();
 
         $this->assertFalse($captureResponse->isSuccessful());
-        $this->assertEquals($captureResponse->getMessage(), 'PAY-2008');
+        $this->assertEquals('PAY-2008', $captureResponse->getMessage());
     }
 
     public function testCaptureProductNoProductsBadFlow()
@@ -67,6 +67,6 @@ class CaptureFlowTest extends TestBaseOmniPay
         $captureResponse = $gateway->captureProducts(['captureProductsUrl' => $captureProductsUrl, 'items' => []])->send();
 
         $this->assertFalse($captureResponse->isSuccessful());
-        $this->assertEquals($captureResponse->getMessage(), 'PAY-1422');
+        $this->assertEquals('PAY-1422', $captureResponse->getMessage());
     }
 }

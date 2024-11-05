@@ -16,6 +16,6 @@ class DeclineFlowTest extends TestBaseOmniPay
         $declineResponse = $gateway->decline(['declineUrl' => $declineUrl])->send();
 
         $this->assertFalse($declineResponse->isSuccessful());
-        $this->assertEquals($declineResponse->getMessage(), 'PAY-2005');
+        $this->assertEquals('PAY-2005', $declineResponse->getMessage());
     }
 }
