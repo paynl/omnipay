@@ -11,10 +11,10 @@ class FetchTransactionRequest extends AbstractPaynlRequest
      */
     public function getData()
     {
-        $this->validate('tokenCode', 'apiSecret', 'transactionReference');
+        $this->validate('tokenCode', 'apiSecret', 'stateUrl');
 
         return [
-            'id' => $this->getParameter('transactionReference')
+            'url' => $this->getParameter('stateUrl')
         ];
     }
 
@@ -24,8 +24,17 @@ class FetchTransactionRequest extends AbstractPaynlRequest
      */
     public function sendData($data)
     {
-        $statusUrl = '/' . $data['id'] . '/status';
-        $responseData = $this->sendRequestMultiCore($statusUrl);
+        $responseData = $this->sendRequest($data['url']);
         return $this->response = new FetchTransactionResponse($this, $responseData);
+    }
+
+    public function getStateUrl()
+    {
+        return $this->getParameter('stateUrl');
+    }
+
+    public function setStateUrl($value)
+    {
+        return $this->setParameter('stateUrl', $value);
     }
 }

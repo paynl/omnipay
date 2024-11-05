@@ -2,9 +2,8 @@
 
 namespace Omnipay\PaynlV3\Message\Request;
 
+use GuzzleHttp\Exception\ConnectException;
 use Omnipay\Common\Message\AbstractRequest;
-use Omnipay\PaynlV3\Internal\PayOrderNotFoundResponse;
-use Omnipay\PaynlV3\Message\Response\FetchServiceConfigResponse;
 
 /**
  * Class OrderAbstractPaynlRequest
@@ -17,61 +16,68 @@ abstract class AbstractPaynlRequest extends AbstractRequest
      */
     private $restUri = 'https://rest.pay.nl/v2/';
     private $baseUrlPrefix = 'https://connect.';
-    private $version = 'v1/orders';
+    private $ordersEdnpoint = 'v1/orders';
 
 
     /**
-     * @param string $endpoint
-     * @param array|null $data
-     * @return \Psr\Http\Message\ResponseInterface
+     * @param array $data
+     * @return \Psr\Http\Message\ResponseInterface|null
      */
-    public function sendRequestMultiCore($endpoint, array $data = null, string $method = 'GET', $fetchConfig = false)
+    public function sendRequestOrderApi(array $data)
     {
-        $configResponse = $this->sendRequestRestApi('services/config');
+        $coreDomains = $this->getCoreDomains();
+        $lastResult = null;
 
-        $decodedResponse = new FetchServiceConfigResponse($this, $configResponse);
-        $jsonErrorResponse = null;
+        foreach ($coreDomains as $coreDomain) {
+            try {
+                $url = $this->baseUrlPrefix . $coreDomain . '/' . $this->ordersEdnpoint;
+                $response = $this->sendRequest($url, $data, 'POST', false);
 
-        $headers = $this->getAuthHeader();
-        $headers += ['Content-Type' => 'application/json', 'accept' => 'application/json'];
-
-        foreach ($decodedResponse->getActiveTguList() as $activeTgu)
-        {
-            $url = $this->baseUrlPrefix . $activeTgu['domain'] . '/' . $this->version . $endpoint;
-            $body = null;
-            if (!is_null($data)) {
-                $body = json_encode($data);
-            }
-
-            $response = $this->httpClient->request($method, $url, $headers, $body);
-
-            if ($response->getStatusCode() === 404) {
-                $jsonErrorResponse = json_decode($response->getBody(), true);
-                $decodedErrorResponse = new PayOrderNotFoundResponse($jsonErrorResponse);
-                if ($decodedErrorResponse->orderNotFoundState()) {
-                   continue;
+                if ($response->getStatusCode() === 500 || $response->getStatusCode() === 503 || $response->getStatusCode() == null) {
+                    $lastResult = $response;
+                    continue;
                 }
 
+                // If we get here, the request was successful, so return immediately
+                return json_decode($response->getBody(), true);
+            } catch (ConnectException) {
+                // Connection failed (domain is down), store response and continue to next domain
+                continue;
             }
-
-            return json_decode($response->getBody(), true);
         }
 
-        return $jsonErrorResponse;
+        // If we get here, all domains failed
+        return json_decode($lastResult->getBody(), true);
     }
 
-    public function sendRequestRestApi($endpoint, array $data = null, string $method = 'GET') {
+    public function sendRequestRestApi(string $endpoint, array $data = null, string $method = 'GET')
+    {
+        $url = $this->restUri . $endpoint;
+
+        return $this->sendRequest($url, $data, $method);
+    }
+
+
+    public function sendRequest(string $url, array $data = null, string $method = 'GET', bool $returnOnlyBody = true)
+    {
         $headers = $this->getAuthHeader();
         $headers += ['Content-Type' => 'application/json', 'accept' => 'application/json'];
 
-        $url = $this->restUri . $endpoint;
         $body = null;
+
         if (!is_null($data)) {
             $body = json_encode($data);
         }
 
         $response = $this->httpClient->request($method, $url, $headers, $body);
-        return json_decode($response->getBody(), true);
+        if ($returnOnlyBody)
+        {
+            return json_decode($response->getBody(), true);
+        }
+        else
+        {
+            return $response;
+        }
     }
 
     /**
@@ -138,5 +144,18 @@ abstract class AbstractPaynlRequest extends AbstractRequest
     public function getServiceId()
     {
         return $this->getParameter('serviceId');
+    }
+
+    /**
+     * @return array
+     */
+    public function getCoreDomains(): array
+    {
+        $coreDomains = $this->getParameter('coreDomains');
+        if (!isset($coreDomains) || count($coreDomains) == 0) {
+            return array('pay.nl');
+        }
+
+        return $coreDomains;
     }
 }

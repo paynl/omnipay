@@ -7,7 +7,7 @@ use Omnipay\Common\Message\RequestInterface;
 class FetchServiceConfigResponse {
 
     protected RequestInterface $request;
-    protected mixed $data;
+    protected $data;
 
     public function __construct(RequestInterface $request, $data)
     {
@@ -24,9 +24,9 @@ class FetchServiceConfigResponse {
     }
 
     /**
-     * @return array|mixed
+     * @return array
      */
-    public function getActiveTguList()
+    public function getActiveTguList(): array
     {
         $array = isset($this->data['tguList']) ? $this->data['tguList'] : [];
         return array_filter($array, function ($item) {

@@ -19,10 +19,10 @@ class VoidRequest extends AbstractPaynlRequest
      */
     public function getData()
     {
-        $this->validate('tokenCode', 'apiSecret', 'transactionReference');
+        $this->validate('tokenCode', 'apiSecret', 'voidUrl');
 
         return [
-            'id' => $this->getParameter('transactionReference')
+            'url' => $this->getParameter('voidUrl')
         ];
     }
 
@@ -32,9 +32,17 @@ class VoidRequest extends AbstractPaynlRequest
      */
     public function sendData($data)
     {
-        $voidUrl = '/' . $data['id'] . '/void';
-
-        $responseData = $this->sendRequestMultiCore($voidUrl, method: 'PATCH');
+        $responseData = $this->sendRequest($data['url'], method: 'PATCH');
         return $this->response = new VoidResponse($this, $responseData);
+    }
+
+    public function getVoidUrl()
+    {
+        return $this->getParameter('voidUrl');
+    }
+
+    public function setVoidUrl($value)
+    {
+        return $this->setParameter('voidUrl', $value);
     }
 }

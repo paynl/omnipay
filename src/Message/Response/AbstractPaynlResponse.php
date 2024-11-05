@@ -21,11 +21,34 @@ abstract class AbstractPaynlResponse extends AbstractResponse
     }
 
     /**
+     * @return integer
+     */
+    public function getOrderStateCode()
+    {
+        return $this->data['status']['code'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderState()
+    {
+        return $this->data['status']['action'];
+    }
+
+    /**
+     * @return null|string The error message
+     */
+    public function getDetails()
+    {
+        return isset($this->data['detail']) && !empty($this->data['detail']) ? $this->data['detail'] : null;
+    }
+
+    /**
      * @return null|string The error message
      */
     public function getMessage()
     {
         return isset($this->data['code']) && !empty($this->data['code']) ? $this->data['code'] : null;
     }
-
 }

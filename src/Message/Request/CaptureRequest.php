@@ -1,7 +1,6 @@
 <?php
 namespace Omnipay\PaynlV3\Message\Request;
 
-use Omnipay\PaynlV3\Common\Item;
 use Omnipay\PaynlV3\Message\Response\CaptureResponse;
 
 class CaptureRequest extends AbstractPaynlRequest
@@ -12,30 +11,10 @@ class CaptureRequest extends AbstractPaynlRequest
      */
     public function getData()
     {
-        $this->validate('tokenCode', 'apiSecret', 'transactionReference');
-        $data = [
-            'id' =>   $this->getParameter('transactionReference'),
-            'amount' => $this->getAmountInteger(),
-            'products' => array()
+        $this->validate('tokenCode', 'apiSecret', 'captureUrl');
+        return [
+            'url' =>   $this->getParameter('captureUrl'),
         ];
-
-        if ($items = $this->getItems()) {
-            $data['products'] = array_map(function ($item) {
-                /** @var Item | \Omnipay\Common\Item $item */
-                if (method_exists($item, 'getProductId')) {
-                    $productId = $item->getProductId();
-                } else {
-                    $productId = substr($item->getName(), 0, 25);
-                }
-
-                return [
-                    'id' => $productId,
-                    'quantity' => $item->getQuantity(),
-                ];
-            }, $items->all());
-        }
-
-        return $data;
     }
 
     /**
@@ -44,20 +23,17 @@ class CaptureRequest extends AbstractPaynlRequest
      */
     public function sendData($data)
     {
-        $response = null;
-
-        if (isset($data['products']) && count($data['products']) > 0) {
-            $url = '/' . $data['id'] . '/capture/products';
-            $postObject = ['products' => $data['products']];
-            $responseData = $this->sendRequestMultiCore($url, $postObject,'PATCH');
-        }
-
-        if (isset($data['amount']) && $data['amount'] > 0) {
-            $url = '/' . $data['id'] . '/capture/amount';
-            $postObject = ['amount' => $data['amount']];
-            $responseData = $this->sendRequestMultiCore($url, $postObject,'PATCH');
-        }
-
+        $responseData = $this->sendRequest($data['url'], null, 'PATCH');
         return $this->response = new CaptureResponse($this, $responseData);
+    }
+
+    public function getCaptureUrl()
+    {
+        return $this->getParameter('captureUrl');
+    }
+
+    public function setCaptureUrl($value)
+    {
+        return $this->setParameter('captureUrl', $value);
     }
 }

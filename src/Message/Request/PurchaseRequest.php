@@ -9,7 +9,7 @@ class PurchaseRequest extends AbstractPaynlRequest
      * Regex to find streetname, housenumber and suffix out of a street string
      * @var string
      */
-    private $addressRegex = '#^([a-z0-9 [:punct:]\']*) ([0-9]{1,5})([a-z0-9 \-/]{0,})$#i';
+    private string $addressRegex = '#^([a-z0-9 [:punct:]\']*) ([0-9]{1,5})([a-z0-9 \-/]{0,})$#i';
 
     /**
      * @return array
@@ -17,7 +17,7 @@ class PurchaseRequest extends AbstractPaynlRequest
      */
     public function getData()
     {
-        $this->validate('amount', 'returnUrl');
+        $this->validate('amount', 'serviceId');
 
         $data = [
             'serviceId' => $this->getServiceId(),
@@ -31,7 +31,7 @@ class PurchaseRequest extends AbstractPaynlRequest
                 'currency' => !empty($this->getCurrency()) ? $this->getCurrency() : 'EUR',
             ],
             'integration' => [
-                'test' => $this->getTestMode(),
+                'test' => $this->getTestMode() ?? false,
             ],
             'paymentMethod' => [
                 'id' => !empty($this->getPaymentMethod()) ? $this->getPaymentMethod() : null,
@@ -74,9 +74,9 @@ class PurchaseRequest extends AbstractPaynlRequest
             $data['order']['countryCode'] = !empty($card->getCountry()) ? substr($card->getCountry(), 0, 2) : null;
             $data['order']['invoiceAddress']['firstName'] = $card->getBillingFirstName();
             $data['order']['invoiceAddress']['lastName'] = $card->getBillingLastName();
-            $data['order']['invoiceAddress']['street'] = $billingAddressParts[1];
-            $data['order']['invoiceAddress']['streetNumber'] = $billingAddressParts[2];
-            $data['order']['invoiceAddress']['streetNumberExtension'] = isset($billingAddressParts[3]) ? $billingAddressParts[3] : null;
+            $data['order']['invoiceAddress']['street'] = $billingAddressParts[1] ?? null;
+            $data['order']['invoiceAddress']['streetNumber'] = $billingAddressParts[2] ?? null;
+            $data['order']['invoiceAddress']['streetNumberExtension'] = $billingAddressParts[3] ?? null;
             $data['order']['invoiceAddress']['zipCode'] = $card->getBillingPostcode();
             $data['order']['invoiceAddress']['city'] = $card->getBillingCity();
             $data['order']['invoiceAddress']['country'] = $card->getBillingCountry();
@@ -84,9 +84,9 @@ class PurchaseRequest extends AbstractPaynlRequest
 
             $data['order']['deliveryAddress']['firstName'] = $card->getShippingFirstName();
             $data['order']['deliveryAddress']['lastName'] = $card->getShippingLastName();
-            $data['order']['deliveryAddress']['street'] = $shippingAddressParts[1];
-            $data['order']['deliveryAddress']['streetNumber'] = $shippingAddressParts[2];
-            $data['order']['deliveryAddress']['streetNumberExtension'] = isset($shippingAddressParts[3]) ? $shippingAddressParts[3] : null;
+            $data['order']['deliveryAddress']['street'] = $shippingAddressParts[1] ?? null;
+            $data['order']['deliveryAddress']['streetNumber'] = $shippingAddressParts[2] ?? null;
+            $data['order']['deliveryAddress']['streetNumberExtension'] = $shippingAddressParts[3] ?? null;
             $data['order']['deliveryAddress']['zipCode'] = $card->getShippingPostcode();
             $data['order']['deliveryAddress']['city'] = $card->getShippingCity();
             $data['order']['deliveryAddress']['country'] = $card->getShippingCountry();
@@ -142,7 +142,7 @@ class PurchaseRequest extends AbstractPaynlRequest
      */
     public function sendData($data)
     {
-        $responseData = $this->sendRequestMultiCore('', $data, 'POST');
+        $responseData = $this->sendRequestOrderApi($data);
         return $this->response = new PurchaseResponse($this, $responseData);
     }
 
