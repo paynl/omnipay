@@ -15,7 +15,7 @@ class CaptureProductsRequest extends AbstractPaynlRequest
         $this->validate('tokenCode', 'apiSecret', 'captureProductsUrl', 'items');
         $data = [
             'url' => $this->getCaptureProductsUrl(),
-            'products' => array()
+            'products' => [],
         ];
 
         if ($items = $this->getItems()) {
@@ -63,8 +63,8 @@ class CaptureProductsRequest extends AbstractPaynlRequest
         return $this->getParameter('items');
     }
 
-    public function setItems($value)
+    public function setItems($items)
     {
-        return $this->setParameter('items', $value);
+        return $this->setParameter('items', $items);
     }
 }

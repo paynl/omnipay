@@ -17,6 +17,6 @@ class VoidFlowTest extends TestBaseOmniPay
         $voidResponse = $gateway->void(['voidUrl' => $voidUrl])->send();
 
         $this->assertFalse($voidResponse->isSuccessful());
-        $this->assertEquals($voidResponse->getMessage(), 'PAY-2009');
+        $this->assertEquals('PAY-2009', $voidResponse->getMessage());
     }
 }
