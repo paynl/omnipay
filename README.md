@@ -393,7 +393,7 @@ Replace the empty values with your Pay.nl credentials:
 
 ## Running Tests
 
-To run all tests:
+To run all the tests:
 ```bash
 ./vendor/bin/phpunit --testsuite "Omni pay v3 tests"
 ```
